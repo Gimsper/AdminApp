@@ -1,6 +1,5 @@
 import { Platform, StyleSheet } from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { View } from 'react-native';
@@ -20,7 +19,6 @@ export default function HomeScreen() {
   useEffect(() => {
     const fetchItems = async () => {
       const response = await getItems();
-      console.log('response', response);
       if (response.data) {
         setItems(response.data);
       }
