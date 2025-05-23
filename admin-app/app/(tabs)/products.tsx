@@ -10,6 +10,8 @@ import { Table, Rows, Row } from 'react-native-table-component'
 import { useEffect, useState } from 'react';
 import { getItems, deleteItem } from '@/actions/item';
 import AddItemModal from '@/components/modals/AddItemModal';
+import UpdateItemModal from '@/components/modals/UpdateItemModal';
+
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -53,9 +55,13 @@ export default function HomeScreen() {
       e.name,
       e.categoryName,
       e.price,
-      <View style={{ flexDirection: 'row' }}>
+      <View style={{ flexDirection: 'row', gap: 8 }}>
         <Button
           title="Editar"
+          onPress={() => {
+            setItemToEdit(e);
+            setEditModalVisible(true);
+          }}
         />
         <Button
           title="Eliminar"
@@ -96,6 +102,21 @@ export default function HomeScreen() {
         isOpen={addModalVisible}
         onClose={() => setAddModalVisible(false)}
         onItemAdded={handleOnItemCreated}
+      />
+      <UpdateItemModal
+        isOpen={editModalVisible}
+        item={itemToEdit}
+        onClose={() => {
+          setEditModalVisible(false);
+          setItemToEdit(null);
+        }}
+        onItemUpdated={(updatedItem) => {
+          const updatedItems = items.map((item: any) =>
+            item.itemId === updatedItem.itemId ? updatedItem : item
+          );
+          setItems(updatedItems);
+          setEditModalVisible(false);
+        }}
       />
     </>
   );
