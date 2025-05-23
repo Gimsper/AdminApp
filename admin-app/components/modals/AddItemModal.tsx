@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Button, GestureResponderEvent } from 'react-native';
 
 import { getCategories } from '@/actions/category';
-import { Picker } from '@react-native-picker/picker'
 
 import { ThemedView } from '../ThemedView';
 import { ThemedText } from '../ThemedText';
@@ -44,8 +43,6 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, onItemAdde
             error = "El precio no es válido"
         else if (!category || category === 0)
             error = "No se seleccionado una categoría"
-
-        console.log(category)
 
         if (error.length !== 0) {
             setError(error);
@@ -115,16 +112,14 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, onItemAdde
                     </ThemedView>
                     <ThemedView>
                         <ThemedText>Categoría:</ThemedText>
-                        <Picker
-                            selectedValue={category}
-                            onValueChange={setCategory}
+                        <select
+                            onChange={e => setCategory(Number(e.target.value))}
                             style={{ ...styles.select, borderColor: colorScheme === 'dark' ? '#aaa' : '#000', color: colorScheme === 'dark' ? '#aaa' : '#000' }}
                         >
-                            <Picker.Item label="Selecciona una opción" value="" />
+                            <option value="" selected hidden>Seleccione una categoría</option>
                             {categories.map(cat => (
-                                <Picker.Item key={cat.categoryId} label={cat.name} value={cat.categoryId} />
-                            ))}
-                        </Picker>
+                                <option key={cat.categoryId} value={cat.categoryId}>{cat.name}</option>                            ))}
+                        </select>
                     </ThemedView>
                     {error && <ThemedText style={styles.error}>{error}</ThemedText>}
                     <ThemedView style={styles.modalActions}>

@@ -43,7 +43,7 @@ export const createItem = async (item: any) => {
         data: item,
     })
     .then((response) => {
-        return response.data;
+        result.data = response.data;
     })
     .catch((error) => {
         console.error("Error creating item:", error);

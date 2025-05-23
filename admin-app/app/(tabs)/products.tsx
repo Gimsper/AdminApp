@@ -1,9 +1,11 @@
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, Button, ScrollView, FlatList } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { View } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
+
+import { Table, Rows, Row } from 'react-native-table-component'
 
 import { useEffect, useState } from 'react';
 import { getItems, deleteItem } from '@/actions/item';
@@ -43,48 +45,51 @@ export default function HomeScreen() {
     setAddModalVisible(false);
   }
 
+  const getItemsTableData = () => {
+      if (!Array.isArray(items)) return [];
+
+    return items.map((e) => [
+      e.itemId,
+      e.name,
+      e.categoryName,
+      e.price,
+      <View style={{ flexDirection: 'row' }}>
+        <Button
+          title="Editar"
+        />
+        <Button
+          title="Eliminar"
+          color="red"
+          onPress={() => handleDeleteItem(e.itemId)}
+        />
+      </View>
+    ]);
+  }
+
   return (
     <>
       <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, gap: 24 }}>
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title">Productos</ThemedText>
-          <button
-            onClick={() => handleAddItem()}
-            style={{ backgroundColor: 'rgb(39, 183, 31)', color: 'white', padding: 8, borderRadius: 4, border: 'none', cursor: 'pointer' }}
-          >
-            Agregar producto
-          </button>
+          <Button title='Agregar producto' color='rgb(39, 183, 31)' onPress={handleAddItem} />
         </ThemedView>
         <ThemedView style={styles.stepContainer}>
-          <table style={{ ...styles.table, backgroundColor: colorScheme === 'dark' ? '#333' : '#fff', color: colorScheme === 'dark' ? '#fff' : '#000' }}>
-            <thead>
-              <tr style={{ backgroundColor: colorScheme === 'dark' ? '#666' : 'ddd', height: 40 }}>
-                <th style={{ padding: 8 }}>ID</th>
-                <th>Nombre</th>
-                <th>Categoría</th>
-                <th>Precio</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item: any, index: any) => (
-                <tr key={index} style={{ height: 60 }}>
-                  <td style={{ padding: 8 }}>{item.itemId}</td>
-                  <td>{item.name}</td>
-                  <td>{item.categoryName}</td>
-                  <td>{item.price}$</td>
-                  <td>
-                    <button style={{ backgroundColor: 'rgb(74, 96, 242)', color: 'white', padding: 8, borderRadius: 4, border: 'none', cursor: 'pointer' }}>
-                      Editar
-                    </button>
-                    <button onClick={() => handleDeleteItem(item.itemId)} style={{ backgroundColor: 'red', color: 'white', padding: 8, borderRadius: 4, marginLeft: 8, border: 'none', cursor: 'pointer' }}>
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <ScrollView style={styles.scrollContainer}>
+            <Table style={{ ...styles.table, backgroundColor: colorScheme === 'dark' ? '#333' : '#fff'}}>
+              <Row
+                data={['Id', 'Nombre', 'Categoría', 'Precio', 'Acciones' ]}
+                textStyle={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
+                style={styles.tableHeaders}
+                flexArr={[1, 1, 1, 1, 1]}
+                />
+              <Rows
+                data={getItemsTableData()}
+                textStyle={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
+                style={styles.tableCells}
+                flexArr={[1, 1, 1, 1, 1]}
+              />
+            </Table>
+          </ScrollView>
         </ThemedView>
       </View>
       <AddItemModal
@@ -97,6 +102,11 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flex: 1,
+    marginHorizontal: 15,
+    maxHeight: 400
+  },
   titleContainer: {
     width: '100%',
     padding: 16,
@@ -119,6 +129,17 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderWidth: 1,
     textAlign: 'center',
-    borderRadius: 8,
+  },
+  tableHeaders: {
+    padding: 12,
+    borderBottomColor: "white",
+    borderBottomWidth: 1,
+    textAlign: "center"
+  },
+  tableCells: {
+    padding: 6,
+    borderBottomColor: "white",
+    borderBottomWidth: 1,
+    textAlign: "center"
   }
 });

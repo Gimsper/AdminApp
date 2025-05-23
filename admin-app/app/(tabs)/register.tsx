@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
+import { useShoppingCart } from '@/context/cart';
+import { router } from 'expo-router';
 
 export default function QRCodeScanner() {
+  const { isScanning, setIsScanning, addToShoppingCart, setQrData } = useShoppingCart();
   const [permission, requestPermission] = useCameraPermissions();
-  const [scanned, setScanned] = useState(false);
-  const [qrData, setQrData] = useState<string | null>(null);
 
   if (!permission) {
     return <Text>Verificando permisos...</Text>;
@@ -20,12 +21,12 @@ export default function QRCodeScanner() {
     );
   }
 
-  const handleBarCodeScanned = (result: BarcodeScanningResult) => {
-    if (scanned) return;
-
-    setScanned(true);
-    setQrData(result.data);
-    alert(`Código QR escaneado: ${result.data}`);
+  const handleBarCodeScanned = async (result: BarcodeScanningResult) => {
+    if (!isScanning) {
+      setIsScanning(true);
+      setQrData(result.data);
+      addToShoppingCart(result.data);
+    }
   };
 
   return (
@@ -35,15 +36,20 @@ export default function QRCodeScanner() {
         barcodeScannerSettings={{
           barcodeTypes: ['qr'],
         }}
-        onBarcodeScanned={handleBarCodeScanned}
+        onBarcodeScanned={isScanning ? undefined : handleBarCodeScanned}
       />
-      {scanned && (
-        <Button title="Escanear otro QR" onPress={() => {
-          setScanned(false);
-          setQrData(null);
-        }} />
+      {isScanning && (
+        <>
+          <Button title="Escanear otro QR" onPress={() => {
+            setIsScanning(false);
+            setQrData(null);
+          }} />
+          <Button title="Ir al carrito" onPress={() => {
+            setQrData(null);
+            router.push('/shoppingcar')
+          }} />
+        </>
       )}
-      {qrData && <Text style={styles.result}>Resultado: {qrData}</Text>}
     </View>
   );
 }

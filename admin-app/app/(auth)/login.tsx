@@ -42,7 +42,7 @@ export default function Login() {
   const handleLogin = () => {
     if (!validate()) return;
     setAuthenticated(true);
-    router.push('/(tabs)');
+    router.push('/(tabs)/products');
   };
 
   return (
