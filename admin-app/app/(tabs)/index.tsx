@@ -14,6 +14,8 @@ import QRCodeModal from '@/components/modals/QRCodeModal';
 
 import { Item } from '@/context/cart'
 import { openBrowserAsync } from 'expo-web-browser';
+import UpdateItemModal from '@/components/modals/UpdateItemModal';
+
 
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
@@ -151,6 +153,21 @@ export default function HomeScreen() {
         isOpen={showQRModal}
         onClose={() => setShowQRModal(false)}
         value={QRCodeValue}
+      />
+      <UpdateItemModal
+        isOpen={editModalVisible}
+        item={itemToEdit}
+        onClose={() => {
+          setEditModalVisible(false);
+          setItemToEdit(null);
+        }}
+        onItemUpdated={(updatedItem) => {
+          const updatedItems = items.map((item: any) =>
+            item.itemId === updatedItem.itemId ? updatedItem : item
+          );
+          setItems(updatedItems);
+          setEditModalVisible(false);
+        }}
       />
     </>
   );

@@ -1,8 +1,7 @@
-import { createItem } from '@/actions/item';
+import { updateItem } from '@/actions/item'; 
 import { useEffect, useState } from 'react';
 
 import { StyleSheet, Button, GestureResponderEvent } from 'react-native';
-
 import { getCategories } from '@/actions/category';
 
 import { ThemedView } from '../ThemedView';
@@ -10,13 +9,14 @@ import { ThemedText } from '../ThemedText';
 import { ThemedTextInput } from '../ThemedInput';
 import { useColorScheme } from '../../hooks/useColorScheme.web';
 
-interface AddItemModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onItemAdded: (newItem: any) => any;
+interface UpdateItemModalProps {
+  isOpen: boolean;
+  item: any; 
+  onClose: () => void;
+  onItemUpdated: (updatedItem: any) => void;
 }
 
-const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, onItemAdded }) => {
+const UpdateItemModal: React.FC<UpdateItemModalProps> = ({ isOpen, onClose, onItemUpdated, item }) => {
     const colorScheme = useColorScheme();
     const [name, setName] = useState('');
     const [price, setPrice] = useState(0);
@@ -31,9 +31,26 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, onItemAdde
             if (response.data) {
                 setCategories(response.data);
             }
-        }
+        };
         exec();
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        if (item) {
+            setName(item.name);
+            setPrice(item.price);
+            setCategory(item.categoryId);
+        }
+    }, [item]);
+
+    useEffect(() => {
+    if (item) {
+        setName(item.name);
+        setPrice(item.price);
+        setCategory(item.categoryId);
+    }
+    }, [item]);
+
 
     const validateInputs = () => {
         let error = "";
@@ -42,7 +59,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, onItemAdde
         else if (!price || price === 0)
             error = "El precio no es válido"
         else if (!category || category === 0)
-            error = "No se seleccionado una categoría"
+            error = "No se ha seleccionado una categoría"
 
         if (error.length !== 0) {
             setError(error);
@@ -54,31 +71,29 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, onItemAdde
 
     const handleSubmit = async (e: GestureResponderEvent) => {
         setLoading(true);
-        
+
         if (!validateInputs()) {
             setLoading(false);
             return;
         }
 
         try {
-            const item = {
+            const updatedItem = {
+                ...item,
                 name,
                 price,
                 categoryId: category,
             };
 
-            const response = await createItem(item);
+            const response = await updateItem(updatedItem);
             if (response.data) {
-                setName('');
-                setPrice(0);
-                setCategory(0);
-                onItemAdded(item);
+                onItemUpdated(updatedItem);
                 onClose();
             } else {
-                setError('No se ha podido guardar el producto, vuelva a intentarlo')
+                setError('No se ha podido actualizar el producto, vuelva a intentarlo');
             }
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Error al agregar el item');
+            setError(err.response?.data?.message || 'Error al actualizar el item');
         } finally {
             setLoading(false);
         }
@@ -89,12 +104,12 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, onItemAdde
     return (
         <ThemedView style={styles.modalBackdrop}>
             <ThemedView style={styles.modal}>
-                <ThemedText type="title" style={{ textAlign: "center" }}>Agregar producto</ThemedText>
+                <ThemedText type="title" style={{ textAlign: "center" }}>Editar producto</ThemedText>
                 <ThemedView style={styles.form}>
                     <ThemedView>
                         <ThemedText>Nombre:</ThemedText>
                         <ThemedTextInput
-                            defaultValue={name}
+                            value={name}
                             onChangeText={setName}
                             placeholder='Nombre'
                             maxLength={100}
@@ -104,7 +119,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, onItemAdde
                     <ThemedView>
                         <ThemedText>Precio:</ThemedText>
                         <ThemedTextInput
-                            defaultValue={price.toString()}
+                            value={price.toString()}
                             onChangeText={e => setPrice(Number(e))}
                             placeholder='Precio'
                             style={{ ...styles.inputText, borderColor: colorScheme === 'dark' ? '#aaa' : '#000', color: colorScheme === 'dark' ? '#aaa' : '#000' }}
@@ -113,17 +128,19 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ isOpen, onClose, onItemAdde
                     <ThemedView>
                         <ThemedText>Categoría:</ThemedText>
                         <select
+                            value={category}
                             onChange={e => setCategory(Number(e.target.value))}
                             style={{ ...styles.select, borderColor: colorScheme === 'dark' ? '#aaa' : '#000', color: colorScheme === 'dark' ? '#aaa' : '#000' }}
                         >
-                            <option value="" selected hidden>Seleccione una categoría</option>
+                            <option value="" hidden>Seleccione una categoría</option>
                             {categories.map(cat => (
-                                <option key={cat.categoryId} value={cat.categoryId}>{cat.name}</option>                            ))}
+                                <option key={cat.categoryId} value={cat.categoryId}>{cat.name}</option>
+                            ))}
                         </select>
                     </ThemedView>
                     {error && <ThemedText style={styles.error}>{error}</ThemedText>}
                     <ThemedView style={styles.modalActions}>
-                        <Button title={loading ? 'Agregando...' : 'Agregar'} disabled={loading} onPress={handleSubmit} />
+                        <Button title={loading ? 'Actualizando...' : 'Actualizar'} disabled={loading} onPress={handleSubmit} />
                         <Button title='Cancelar' color='#aaa' onPress={onClose} />
                     </ThemedView>
                 </ThemedView>
@@ -185,4 +202,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default AddItemModal;
+export default UpdateItemModal;

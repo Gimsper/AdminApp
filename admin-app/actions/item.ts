@@ -53,22 +53,20 @@ export const createItem = async (item: any) => {
 }
 
 export const updateItem = async (item: any) => {
-    const result = { data: null, error: null };
-
-    await client({
-        method: "PUT",
-        url: "/Item/Update",
-        data: item,
-    })
-    .then((response) => {
-        return response.data;
-    })
-    .catch((error) => {
-        console.error("Error updating item:", error);
-        throw error;
+  try {
+    const response = await client({
+      method: "PUT",
+      url: "/Item/Update",
+      data: item,
     });
-    return result;
-}
+
+    return { data: response.data, error: null };
+  } catch (error) {
+    console.error("Error updating item:", error);
+    return { data: null, error };
+  }
+};
+
 
 export const deleteItem = async (id: any) => {
     const result = { data: null, error: null };
