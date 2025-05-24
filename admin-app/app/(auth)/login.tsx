@@ -30,7 +30,6 @@ export default function Login() {
     }
     
     const response = await loginUser({ username, password });
-    console.log('response', response);
     if (!response.data) {
       newErrors.username = 'Usuario o contraseña incorrectos';
       setErrors(newErrors);
@@ -42,7 +41,7 @@ export default function Login() {
   const handleLogin = () => {
     if (!validate()) return;
     setAuthenticated(true);
-    router.push('/(tabs)/products');
+    router.push('/(tabs)');
   };
 
   return (

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 
-type Item = {
+export type Item = {
     itemId: number,
     name: string,
     categoryName: string,
