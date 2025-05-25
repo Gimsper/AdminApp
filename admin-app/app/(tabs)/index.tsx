@@ -48,9 +48,12 @@ export default function HomeScreen() {
     setAddModalVisible(true);
   }
 
-  const handleOnItemCreated = (newItem: any) => {
-    setItems([...items, newItem]);
-    setAddModalVisible(false);
+  const handleOnItemCreated = async () => {
+    const response = await getItems();
+    if (response.data) {
+      setItems(response.data);
+    }
+    setEditModalVisible(false);
   }
 
   const handleGenerateQR = (e: Item) => {
@@ -95,7 +98,7 @@ export default function HomeScreen() {
           <ScrollView horizontal={Platform.OS !== 'web'}>
             <FlatList
               data={items}
-              keyExtractor={(item) => item.itemId.toString()}
+              keyExtractor={(item) => item.itemId?.toString()}
               ListHeaderComponent={
                 <View style={[styles.table, { flexDirection: 'row', backgroundColor: colorScheme === 'dark' ? '#333' : '#fff' }]}>
                   {['Id', 'Nombre', 'Categoría', 'Precio', 'Acciones'].map((header, idx) => (
@@ -161,11 +164,11 @@ export default function HomeScreen() {
           setEditModalVisible(false);
           setItemToEdit(null);
         }}
-        onItemUpdated={(updatedItem) => {
-          const updatedItems = items.map((item: any) =>
-            item.itemId === updatedItem.itemId ? updatedItem : item
-          );
-          setItems(updatedItems);
+        onItemUpdated={async () => {
+          const response = await getItems();
+          if (response.data) {
+            setItems(response.data);
+          }
           setEditModalVisible(false);
         }}
       />

@@ -46,7 +46,7 @@ export default function Login() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Iniciar sesión' }} />
+      <Stack.Screen options={{ title: 'Stock Scan' }} />
       <ThemedView style={styles.container}>
         <ThemedText type="title">¡Bienvenido!</ThemedText>
         <ThemedText type="subtitle">Ingrese sus credenciales</ThemedText>

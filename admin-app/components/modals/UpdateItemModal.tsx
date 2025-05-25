@@ -9,6 +9,8 @@ import { ThemedText } from '../ThemedText';
 import { ThemedTextInput } from '../ThemedInput';
 import { useColorScheme } from '../../hooks/useColorScheme.web';
 
+import { Picker } from '@react-native-picker/picker';
+
 interface UpdateItemModalProps {
   isOpen: boolean;
   item: any; 
@@ -120,23 +122,35 @@ const UpdateItemModal: React.FC<UpdateItemModalProps> = ({ isOpen, onClose, onIt
                         <ThemedText>Precio:</ThemedText>
                         <ThemedTextInput
                             value={price.toString()}
-                            onChangeText={e => setPrice(Number(e))}
+                            onChangeText={e => setPrice(parseInt(e))}
                             placeholder='Precio'
                             style={{ ...styles.inputText, borderColor: colorScheme === 'dark' ? '#aaa' : '#000', color: colorScheme === 'dark' ? '#aaa' : '#000' }}
                         />
                     </ThemedView>
                     <ThemedView>
                         <ThemedText>Categoría:</ThemedText>
-                        <select
-                            value={category}
-                            onChange={e => setCategory(Number(e.target.value))}
-                            style={{ ...styles.select, borderColor: colorScheme === 'dark' ? '#aaa' : '#000', color: colorScheme === 'dark' ? '#aaa' : '#000' }}
+                        <Picker
+                            selectedValue={category}
+                            onValueChange={(itemValue) => setCategory(itemValue)}
+                            style={[styles.select, { 
+                                borderColor: colorScheme === 'dark' ? '#aaa' : '#000',
+                                color: colorScheme === 'dark' ? '#aaa' : '#000' 
+                            }]}
+                            dropdownIconColor={colorScheme === 'dark' ? '#aaa' : '#000'}
                         >
-                            <option value="" hidden>Seleccione una categoría</option>
+                            <Picker.Item 
+                                label="Seleccione una categoría" 
+                                value={0} 
+                                enabled={false}
+                            />
                             {categories.map(cat => (
-                                <option key={cat.categoryId} value={cat.categoryId}>{cat.name}</option>
+                                <Picker.Item 
+                                    key={cat.categoryId} 
+                                    label={cat.name} 
+                                    value={cat.categoryId} 
+                                />
                             ))}
-                        </select>
+                        </Picker>
                     </ThemedView>
                     {error && <ThemedText style={styles.error}>{error}</ThemedText>}
                     <ThemedView style={styles.modalActions}>
